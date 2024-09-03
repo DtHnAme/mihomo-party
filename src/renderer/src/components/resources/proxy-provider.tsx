@@ -8,7 +8,7 @@ import Viewer from './viewer'
 import useSWR from 'swr'
 import SettingCard from '../base/base-setting-card'
 import SettingItem from '../base/base-setting-item'
-import { Button, Chip } from '@nextui-org/react'
+import { Button, Chip, Divider, Progress } from '@nextui-org/react'
 import { IoMdRefresh } from 'react-icons/io'
 import { CgLoadbarDoc } from 'react-icons/cg'
 import { MdEditDocument } from 'react-icons/md'
@@ -156,8 +156,8 @@ const ProxyProvider: React.FC = () => {
             </div>
           </SettingItem>
           {provider.subscriptionInfo && (
+            <>
             <SettingItem
-              divider={index !== providers.length - 1}
               title={
                 <div className="text-foreground-500">
                   {`${calcTraffic(
@@ -172,6 +172,14 @@ const ProxyProvider: React.FC = () => {
                   : '长期有效'}
               </div>
             </SettingItem>
+            <Progress
+              className="h-[16px] leading-[16px]"
+              size="md"
+              value={provider.subscriptionInfo.Upload + provider.subscriptionInfo.Download}
+              maxValue={provider.subscriptionInfo.Total} 
+            />
+            {(index !== providers.length - 1) && <Divider className="my-2" />}
+            </>
           )}
         </Fragment>
       ))}
