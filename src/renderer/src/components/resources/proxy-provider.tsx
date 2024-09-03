@@ -3,7 +3,7 @@ import { Fragment, useMemo, useState } from 'react'
 import useSWR from 'swr'
 import SettingCard from '../base/base-setting-card'
 import SettingItem from '../base/base-setting-item'
-import { Button, Chip } from '@nextui-org/react'
+import { Button, Chip, Divider, Progress } from '@nextui-org/react'
 import { IoMdRefresh } from 'react-icons/io'
 import dayjs from 'dayjs'
 import { calcTraffic } from '@renderer/utils/calc'
@@ -87,13 +87,13 @@ const ProxyProvider: React.FC = () => {
               }
             </SettingItem>
             {provider.subscriptionInfo && (
+              <>
               <SettingItem
-                divider={index !== providers.length - 1}
                 title={
                   <div className="text-default-500">{`${calcTraffic(
                     provider.subscriptionInfo.Upload + provider.subscriptionInfo.Download
                   )}
-                    /${calcTraffic(provider.subscriptionInfo.Total)}`}</div>
+                    / ${calcTraffic(provider.subscriptionInfo.Total)}`}</div>
                 }
               >
                 {provider.subscriptionInfo && (
@@ -104,6 +104,14 @@ const ProxyProvider: React.FC = () => {
                   </div>
                 )}
               </SettingItem>
+              <Progress
+                className="h-[16px] leading-[16px]"
+                size="md"
+                value={provider.subscriptionInfo.Upload + provider.subscriptionInfo.Download}
+                maxValue={provider.subscriptionInfo.Total} 
+              />
+              {(index !== providers.length - 1) && <Divider className="my-2" />}
+              </>
             )}
           </Fragment>
         )
