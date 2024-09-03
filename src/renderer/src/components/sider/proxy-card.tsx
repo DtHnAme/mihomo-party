@@ -2,11 +2,10 @@ import { Button, Card, CardBody, CardFooter, Chip } from '@nextui-org/react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { LuGroup } from 'react-icons/lu'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { useGroups } from '@renderer/hooks/use-groups'
 
 const ProxyCard: React.FC = () => {
-  const navigate = useNavigate()
   const location = useLocation()
   const match = location.pathname.includes('/proxies')
   const { groups = [] } = useGroups()
@@ -24,6 +23,7 @@ const ProxyCard: React.FC = () => {
 
   return (
     <div
+      ref={setNodeRef} {...attributes} {...listeners}
       style={{
         position: 'relative',
         transform: CSS.Transform.toString(transform),
@@ -34,12 +34,10 @@ const ProxyCard: React.FC = () => {
     >
       <Card
         fullWidth
-        className={`${match ? 'bg-primary' : ''}`}
-        isPressable
-        onPress={() => navigate('/proxies')}
+        className={`${match ? 'bg-primary' : ''} ${isDragging ? 'scale-[0.97] tap-highlight-transparent' : ''}`}
       >
         <CardBody className="pb-1 pt-0 px-0">
-          <div ref={setNodeRef} {...attributes} {...listeners} className="flex justify-between">
+          <div className="flex justify-between">
             <Button
               isIconOnly
               className="bg-transparent pointer-events-none"

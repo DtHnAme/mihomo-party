@@ -2,12 +2,11 @@ import { Button, Card, CardBody, CardFooter } from '@nextui-org/react'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
 import BorderSwitch from '@renderer/components/base/border-swtich'
 import { LuServer } from 'react-icons/lu'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { patchMihomoConfig } from '@renderer/utils/ipc'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 const DNSCard: React.FC = () => {
-  const navigate = useNavigate()
   const location = useLocation()
   const match = location.pathname.includes('/dns')
   const { controledMihomoConfig, patchControledMihomoConfig } = useControledMihomoConfig()
@@ -31,6 +30,7 @@ const DNSCard: React.FC = () => {
 
   return (
     <div
+      ref={setNodeRef} {...attributes} {...listeners}
       style={{
         position: 'relative',
         transform: CSS.Transform.toString(transform),
@@ -41,12 +41,10 @@ const DNSCard: React.FC = () => {
     >
       <Card
         fullWidth
-        className={`${match ? 'bg-primary' : ''}`}
-        isPressable
-        onPress={() => navigate('/dns')}
+        className={`${match ? 'bg-primary' : ''} ${isDragging ? 'scale-[0.97] tap-highlight-transparent' : ''}`}
       >
         <CardBody className="pb-1 pt-0 px-0">
-          <div ref={setNodeRef} {...attributes} {...listeners} className="flex justify-between">
+          <div className="flex justify-between">
             <Button
               isIconOnly
               className="bg-transparent pointer-events-none"

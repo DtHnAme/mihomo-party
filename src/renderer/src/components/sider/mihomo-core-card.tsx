@@ -5,12 +5,11 @@ import { useEffect, useState } from 'react'
 import { IoMdRefresh } from 'react-icons/io'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import useSWR from 'swr'
 
 const MihomoCoreCard: React.FC = () => {
   const { data: version, mutate } = useSWR('mihomoVersion', mihomoVersion)
-  const navigate = useNavigate()
   const location = useLocation()
   const match = location.pathname.includes('/mihomo')
   const {
@@ -41,6 +40,7 @@ const MihomoCoreCard: React.FC = () => {
 
   return (
     <div
+      ref={setNodeRef} {...attributes} {...listeners}
       style={{
         position: 'relative',
         transform: CSS.Transform.toString(transform),
@@ -51,15 +51,10 @@ const MihomoCoreCard: React.FC = () => {
     >
       <Card
         fullWidth
-        isPressable
-        onPress={() => navigate('/mihomo')}
-        className={`${match ? 'bg-primary' : ''}`}
+        className={`${match ? 'bg-primary' : ''} ${isDragging ? 'scale-[0.97] tap-highlight-transparent' : ''}`}
       >
         <CardBody>
           <div
-            ref={setNodeRef}
-            {...attributes}
-            {...listeners}
             className="flex justify-between h-[32px]"
           >
             <h3

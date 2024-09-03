@@ -1,6 +1,6 @@
 import { Button, Card, CardBody, CardFooter, Chip, Progress } from '@nextui-org/react'
 import { useProfileConfig } from '@renderer/hooks/use-profile-config'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { calcTraffic, calcPercent } from '@renderer/utils/calc'
 import { CgLoadbarDoc } from 'react-icons/cg'
 import { IoMdRefresh } from 'react-icons/io'
@@ -16,7 +16,6 @@ dayjs.extend(relativeTime)
 dayjs.locale('zh-cn')
 
 const ProfileCard: React.FC = () => {
-  const navigate = useNavigate()
   const location = useLocation()
   const match = location.pathname.includes('/profiles')
   const [updating, setUpdating] = useState(false)
@@ -46,6 +45,7 @@ const ProfileCard: React.FC = () => {
 
   return (
     <div
+      ref={setNodeRef} {...attributes} {...listeners}
       style={{
         position: 'relative',
         transform: CSS.Transform.toString(transform),
@@ -57,15 +57,10 @@ const ProfileCard: React.FC = () => {
       {showRuntimeConfig && <ConfigViewer onClose={() => setShowRuntimeConfig(false)} />}
       <Card
         fullWidth
-        className={`${match ? 'bg-primary' : ''}`}
-        isPressable
-        onPress={() => navigate('/profiles')}
+        className={`${match ? 'bg-primary' : ''} ${isDragging ? 'scale-[0.97] tap-highlight-transparent' : ''}`}
       >
         <CardBody className="pb-1">
           <div
-            ref={setNodeRef}
-            {...attributes}
-            {...listeners}
             className="flex justify-between h-[32px]"
           >
             <h3
