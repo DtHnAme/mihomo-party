@@ -3,16 +3,18 @@ import { useProfileConfig } from '@renderer/hooks/use-profile-config'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { calcTraffic, calcPercent } from '@renderer/utils/calc'
 import { CgLoadbarDoc } from 'react-icons/cg'
-import { IoMdRefresh } from 'react-icons/io'
+import { IoMdRefresh, IoMdSwap } from 'react-icons/io'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import 'dayjs/locale/zh-cn'
 import dayjs from 'dayjs'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import ConfigViewer from './config-viewer'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { TiFolder } from 'react-icons/ti'
+import { mihomoProxyProviders, mihomoUpdateProxyProviders } from '@renderer/utils/ipc'
+import useSWR from 'swr'
 
 dayjs.extend(relativeTime)
 dayjs.locale('zh-cn')
@@ -22,6 +24,21 @@ interface Props {
 }
 
 const ProfileCard: React.FC<Props> = (props) => {
+  const { data, mutate } = useSWR('mihomoProxyProviders', mihomoProxyProviders)
+  const providers = useMemo(() => {
+    if (!data) return []
+    return Object.values(data.providers)
+      .filter(provider => 'subscriptionInfo' in provider)
+      .sort((a, b) => {
+        if (a.vehicleType === 'File' && b.vehicleType !== 'File') {
+          return -1
+        }
+        if (a.vehicleType !== 'File' && b.vehicleType === 'File') {
+          return 1
+        }
+        return 0
+      })
+  }, [data])
   const { appConfig, patchAppConfig } = useAppConfig()
   const { iconOnly } = props
   const { profileCardStatus = 'col-span-2', profileDisplayDate = 'expire' } = appConfig || {}
@@ -29,9 +46,16 @@ const ProfileCard: React.FC<Props> = (props) => {
   const navigate = useNavigate()
   const match = location.pathname.includes('/profiles')
   const [updating, setUpdating] = useState(false)
+  const [count, setCount] = useState(0)
   const [showRuntimeConfig, setShowRuntimeConfig] = useState(false)
   const { profileConfig, addProfileItem } = useProfileConfig()
   const { current, items } = profileConfig ?? {}
+  const subscriptionInfo = providers.length ? {
+    upload: providers[count].subscriptionInfo?.Upload,
+    download: providers[count].subscriptionInfo?.Download,
+    total: providers[count].subscriptionInfo?.Total,
+    expire: providers[count].subscriptionInfo?.Expire,
+  } : null
   const {
     attributes,
     listeners,
@@ -49,7 +73,8 @@ const ProfileCard: React.FC<Props> = (props) => {
     name: '空白订阅'
   }
 
-  const extra = info?.extra
+  const extra = info?.extra ?? subscriptionInfo
+
   const usage = (extra?.upload ?? 0) + (extra?.download ?? 0)
   const total = extra?.total ?? 0
 
@@ -99,13 +124,43 @@ const ProfileCard: React.FC<Props> = (props) => {
               {...listeners}
               className="flex justify-between h-[32px]"
             >
-              <h3
-                title={info?.name}
-                className={`text-ellipsis whitespace-nowrap overflow-hidden text-md font-bold leading-[32px] ${match ? 'text-primary-foreground' : 'text-foreground'} `}
-              >
-                {info?.name}
-              </h3>
+              {extra ? (
+                <Chip
+                  variant="bordered"
+                  className={`${match ? 'text-white border-white' : 'text-foreground border-foreground-400'}`}
+                >
+                  {`${subscriptionInfo ? `${providers[count].name}` : `${info?.name}`}`}
+                </Chip>
+              ) : (
+                <h3
+                  title={info?.name}
+                  className={`text-ellipsis whitespace-nowrap overflow-hidden text-md font-bold leading-[32px] ${match ? 'text-primary-foreground' : 'text-foreground'} `}
+                >
+                  {info?.name}
+                </h3>
+              )}
               <div className="flex">
+                {providers.length > 1 && subscriptionInfo && (
+                  <Tooltip placement="left" delay={100} closeDelay={100} content={providers[count].name}>
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="light"
+                      color="default"
+                      onPress={() => {
+                        if (count < providers.length - 1) {
+                          setCount(count + 1)
+                        } else {
+                          setCount(0)
+                        }
+                      }}
+                    >
+                      <IoMdSwap
+                        className={`text-[24px] ${match ? 'text-white' : 'text-foreground'}`}
+                      />
+                    </Button>
+                  </Tooltip>
+                )}
                 <Button
                   isIconOnly
                   size="sm"
@@ -120,8 +175,8 @@ const ProfileCard: React.FC<Props> = (props) => {
                     className={`text-[24px] ${match ? 'text-primary-foreground' : 'text-foreground'}`}
                   />
                 </Button>
-                {info.type === 'remote' && (
-                  <Tooltip placement="left" content={dayjs(info.updated).fromNow()}>
+                {extra && (
+                  <Tooltip placement="left" delay={100} closeDelay={100} content={dayjs(subscriptionInfo ? providers[count].updatedAt : info.updated).fromNow()}>
                     <Button
                       isIconOnly
                       size="sm"
@@ -130,7 +185,15 @@ const ProfileCard: React.FC<Props> = (props) => {
                       color="default"
                       onPress={async () => {
                         setUpdating(true)
-                        await addProfileItem(info)
+                        if (subscriptionInfo) {
+                          try {
+                            await mihomoUpdateProxyProviders(providers[count].name)
+                          } finally {
+                            mutate()
+                          }
+                        } else {
+                          await addProfileItem(info)
+                        }
                         setUpdating(false)
                       }}
                     >
@@ -142,11 +205,11 @@ const ProfileCard: React.FC<Props> = (props) => {
                 )}
               </div>
             </div>
-            {info.type === 'remote' && extra && (
+            {extra && (
               <div
                 className={`mt-2 flex justify-between ${match ? 'text-primary-foreground' : 'text-foreground'} `}
               >
-                <small>{`${calcTraffic(usage)}/${calcTraffic(total)}`}</small>
+                <small>{`${calcTraffic(usage)} / ${calcTraffic(total)}`}</small>
                 {profileDisplayDate === 'expire' ? (
                   <Button
                     size="sm"
@@ -167,7 +230,7 @@ const ProfileCard: React.FC<Props> = (props) => {
                       await patchAppConfig({ profileDisplayDate: 'expire' })
                     }}
                   >
-                    {dayjs(info.updated).fromNow()}
+                    {dayjs(subscriptionInfo ? providers[count].updatedAt : info.updated).fromNow()}
                   </Button>
                 )}
               </div>
@@ -188,7 +251,7 @@ const ProfileCard: React.FC<Props> = (props) => {
                 <small>{dayjs(info.updated).fromNow()}</small>
               </div>
             )}
-            {info.type === 'local' && (
+            {info.type === 'local' && !extra && (
               <div
                 className={`mt-2 flex justify-between ${match ? 'text-primary-foreground' : 'text-foreground'}`}
               >
