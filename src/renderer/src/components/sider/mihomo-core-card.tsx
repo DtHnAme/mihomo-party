@@ -24,6 +24,7 @@ const MihomoCoreCard: React.FC = () => {
   })
   const transform = tf ? { x: tf.x, y: tf.y, scaleX: 1, scaleY: 1 } : null
   const [mem, setMem] = useState(0)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const token = PubSub.subscribe('mihomo-core-changed', () => {
@@ -31,6 +32,7 @@ const MihomoCoreCard: React.FC = () => {
     })
     window.electron.ipcRenderer.on('mihomoMemory', (_e, info: IMihomoMemoryInfo) => {
       setMem(info.inuse)
+      setLoading(info.inuse == 0)
     })
     return (): void => {
       PubSub.unsubscribe(token)
@@ -68,6 +70,7 @@ const MihomoCoreCard: React.FC = () => {
               size="sm"
               variant="light"
               color="default"
+              disabled={loading}
               onPress={async () => {
                 try {
                   await restartCore()
@@ -78,7 +81,7 @@ const MihomoCoreCard: React.FC = () => {
                 }
               }}
             >
-              <IoMdRefresh className={`${match ? 'text-white' : 'text-foreground'} text-[24px]`} />
+              <IoMdRefresh className={`${loading ? 'animate-spin' : ''} ${match ? 'text-white' : 'text-foreground'} text-[24px]`} />
             </Button>
           </div>
         </CardBody>
@@ -86,7 +89,7 @@ const MihomoCoreCard: React.FC = () => {
           <div
             className={`flex justify-between w-full text-md font-bold ${match ? 'text-white' : 'text-foreground'}`}
           >
-            <h4>内核设置</h4>
+            <h4>{loading ? '重启中...' : '内核设置'}</h4>
             <h4>{calcTraffic(mem)}</h4>
           </div>
         </CardFooter>
