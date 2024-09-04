@@ -6,7 +6,6 @@ import { FaMapPin } from 'react-icons/fa6'
 interface Props {
   mutateProxies: () => void
   onProxyDelay: (proxy: string, url?: string) => Promise<IMihomoDelay>
-  proxyDisplayMode: 'simple' | 'full'
   proxy: IMihomoProxy | IMihomoGroup
   group: IMihomoMixedGroup
   onSelect: (group: string, proxy: string) => void
@@ -14,7 +13,7 @@ interface Props {
 }
 
 const ProxyItem: React.FC<Props> = (props) => {
-  const { mutateProxies, proxyDisplayMode, group, proxy, selected, onSelect, onProxyDelay } = props
+  const { mutateProxies, group, proxy, selected, onSelect, onProxyDelay } = props
 
   const delay = useMemo(() => {
     if (proxy.history.length > 0) {
@@ -62,11 +61,6 @@ const ProxyItem: React.FC<Props> = (props) => {
             <div className="flag-emoji inline" title={proxy.name}>
               {proxy.name}
             </div>
-            {proxyDisplayMode === 'full' && (
-              <div className="inline ml-2 text-foreground-500" title={proxy.type}>
-                {proxy.type}
-              </div>
-            )}
           </div>
           <div className="flex justify-end">
             {fixed && (
