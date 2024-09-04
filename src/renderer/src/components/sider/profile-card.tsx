@@ -76,7 +76,6 @@ const ProfileCard: React.FC = () => {
 
   return (
     <div
-      ref={setNodeRef} {...attributes} {...listeners}
       style={{
         position: 'relative',
         transform: CSS.Transform.toString(transform),
@@ -88,6 +87,7 @@ const ProfileCard: React.FC = () => {
       {showRuntimeConfig && <ConfigViewer onClose={() => setShowRuntimeConfig(false)} />}
       <Card
         fullWidth
+        ref={setNodeRef} {...attributes} {...listeners}
         className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? 'scale-[0.97] tap-highlight-transparent' : ''}`}
       >
         <CardBody className="pb-1">
