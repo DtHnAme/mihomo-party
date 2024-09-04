@@ -218,7 +218,6 @@ export const startMihomoMemory = async (): Promise<void> => {
 
 export const stopMihomoMemory = (): void => {
   if (mihomoMemoryWs) {
-    mainWindow?.webContents.send('mihomoMemory', {inuse: 0, oslimit: 0} as IMihomoMemoryInfo)
     mihomoMemoryWs.removeAllListeners()
     if (mihomoMemoryWs.readyState === WebSocket.OPEN) {
       mihomoMemoryWs.close()

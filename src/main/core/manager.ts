@@ -93,6 +93,7 @@ export async function startCore(): Promise<Promise<void>[]> {
           new Promise((resolve) => {
             child.stdout?.on('data', async (data) => {
               if (data.toString().includes('Start initial Compatible provider default')) {
+                mainWindow?.webContents.send('coreStopped', false)
                 mainWindow?.webContents.send('coreRestart')
                 resolve()
               }
@@ -119,6 +120,7 @@ export async function stopCore(force = false): Promise<void> {
       flag: 'a'
     })
   }
+  mainWindow?.webContents.send('coreStopped', true)
 
   if (child) {
     child.removeAllListeners()
