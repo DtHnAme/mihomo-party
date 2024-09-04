@@ -40,7 +40,6 @@ const ConnectionItem: React.FC<Props> = (props) => {
               </Chip>
               <div className="text-ellipsis whitespace-nowrap overflow-hidden">
                 {info.metadata.process || info.metadata.sourceIP}
-                {(info.metadata.type === 'Inner') ? 'mihomo': ''}
                 {' -> '}
                 {info.metadata.host ||
                   info.metadata.sniffHost ||
