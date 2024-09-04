@@ -67,10 +67,13 @@ const MihomoCoreCard: React.FC = () => {
 
             <Button
               isIconOnly
+              isLoading={loading}
               size="sm"
               variant="light"
               color="default"
-              disabled={loading}
+              spinner={
+                <IoMdRefresh className={`${match ? 'text-white' : 'text-foreground'} animate-spin text-[24px]`}/>
+              }
               onPress={async () => {
                 try {
                   await restartCore()
@@ -81,7 +84,7 @@ const MihomoCoreCard: React.FC = () => {
                 }
               }}
             >
-              <IoMdRefresh className={`${loading ? 'animate-spin' : ''} ${match ? 'text-white' : 'text-foreground'} text-[24px]`} />
+              <IoMdRefresh className={`${match ? 'text-white' : 'text-foreground'} text-[24px]`} />
             </Button>
           </div>
         </CardBody>
@@ -89,7 +92,7 @@ const MihomoCoreCard: React.FC = () => {
           <div
             className={`flex justify-between w-full text-md font-bold ${match ? 'text-white' : 'text-foreground'}`}
           >
-            <h4>{loading ? '重启中...' : '内核设置'}</h4>
+            <h4>{loading ? '连接中...' : '内核设置'}</h4>
             <h4>{calcTraffic(mem)}</h4>
           </div>
         </CardFooter>
