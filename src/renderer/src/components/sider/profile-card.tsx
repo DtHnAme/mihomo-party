@@ -3,25 +3,44 @@ import { useProfileConfig } from '@renderer/hooks/use-profile-config'
 import { useLocation } from 'react-router-dom'
 import { calcTraffic, calcPercent } from '@renderer/utils/calc'
 import { CgLoadbarDoc } from 'react-icons/cg'
-import { IoMdRefresh } from 'react-icons/io'
+import { IoMdRefresh, IoMdSwap } from 'react-icons/io'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import 'dayjs/locale/zh-cn'
 import dayjs from 'dayjs'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ConfigViewer from './config-viewer'
+import useSWR from 'swr'
+import { mihomoProxyProviders, mihomoUpdateProxyProviders } from '@renderer/utils/ipc'
 
 dayjs.extend(relativeTime)
 dayjs.locale('zh-cn')
 
 const ProfileCard: React.FC = () => {
+  const { data, mutate } = useSWR('mihomoProxyProviders', mihomoProxyProviders)
+  const providers = useMemo(() => {
+    if (!data) return []
+    if (!data.providers) return []
+    return Object.keys(data.providers)
+      .map((key) => data.providers[key])
+      .filter((provider) => {
+        return 'subscriptionInfo' in provider
+      })
+  }, [data]).reverse()
   const location = useLocation()
   const match = location.pathname.includes('/profiles')
   const [updating, setUpdating] = useState(false)
+  const [index, setIndex] = useState(0)
   const [showRuntimeConfig, setShowRuntimeConfig] = useState(false)
   const { profileConfig, addProfileItem } = useProfileConfig()
   const { current, items } = profileConfig ?? {}
+  const subscriptionInfo = providers.length ? {
+    upload: providers[index].subscriptionInfo?.Upload,
+    download: providers[index].subscriptionInfo?.Download,
+    total: providers[index].subscriptionInfo?.Total,
+    expire: providers[index].subscriptionInfo?.Expire,
+  } : null
   const {
     attributes,
     listeners,
@@ -39,9 +58,21 @@ const ProfileCard: React.FC = () => {
     name: '空白订阅'
   }
 
-  const extra = info?.extra
+  const extra = info?.extra ?? subscriptionInfo
+
   const usage = (extra?.upload ?? 0) + (extra?.download ?? 0)
   const total = extra?.total ?? 0
+
+  useEffect(() => {
+    window.electron.ipcRenderer.on('coreRestart', () => {
+      setTimeout(() => {
+        mutate()
+      }, 2000)
+    })
+    return (): void => {
+      window.electron.ipcRenderer.removeAllListeners('coreRestart')
+    }
+  }, [])
 
   return (
     <div
@@ -70,6 +101,26 @@ const ProfileCard: React.FC = () => {
               {info?.name}
             </h3>
             <div className="flex">
+              {providers.length > 1 && subscriptionInfo && (
+                <Button
+                  isIconOnly
+                  size="sm"
+                  title={providers[index].name}
+                  variant="light"
+                  color="default"
+                  onPress={() => {
+                    if (index < providers.length - 1) {
+                      setIndex(index + 1)
+                    } else {
+                      setIndex(0)
+                    }
+                  }}
+                >
+                  <IoMdSwap
+                    className={`text-[24px] ${match ? 'text-white' : 'text-foreground'}`}
+                  />
+                </Button>
+              )}
               <Button
                 isIconOnly
                 size="sm"
@@ -84,17 +135,25 @@ const ProfileCard: React.FC = () => {
                   className={`text-[24px] ${match ? 'text-white' : 'text-foreground'}`}
                 />
               </Button>
-              {info.type === 'remote' && (
+              {extra && (
                 <Button
                   isIconOnly
                   size="sm"
-                  title={dayjs(info.updated).fromNow()}
+                  title={dayjs(subscriptionInfo ? providers[index].updatedAt : info.updated).fromNow()}
                   disabled={updating}
                   variant="light"
                   color="default"
                   onPress={async () => {
                     setUpdating(true)
-                    await addProfileItem(info)
+                    if (subscriptionInfo) {
+                      try {
+                        await mihomoUpdateProxyProviders(providers[index].name)
+                      } finally {
+                        mutate()
+                      }
+                    } else {
+                      await addProfileItem(info)
+                    }
                     setUpdating(false)
                   }}
                 >
@@ -105,7 +164,7 @@ const ProfileCard: React.FC = () => {
               )}
             </div>
           </div>
-          {info.type === 'remote' && extra && (
+          {extra && (
             <div
               className={`mt-2 flex justify-between ${match ? 'text-white' : 'text-foreground'} `}
             >
@@ -115,7 +174,7 @@ const ProfileCard: React.FC = () => {
               </small>
             </div>
           )}
-          {info.type === 'local' && (
+          {info.type === 'local' && !extra && (
             <div
               className={`mt-2 flex justify-between ${match ? 'text-white' : 'text-foreground'}`}
             >
