@@ -40,6 +40,7 @@ const ConnectionItem: React.FC<Props> = (props) => {
               </Chip>
               <div className="text-ellipsis whitespace-nowrap overflow-hidden">
                 {info.metadata.process || info.metadata.sourceIP}
+                {(info.metadata.type === 'Inner') ? 'mihomo': ''}
                 {' -> '}
                 {info.metadata.host ||
                   info.metadata.sniffHost ||
@@ -62,7 +63,24 @@ const ConnectionItem: React.FC<Props> = (props) => {
                 radius="sm"
                 variant="bordered"
               >
+                {[...info.chains].reverse()[0]}
+              </Chip>
+              <Chip
+                className="flag-emoji text-ellipsis whitespace-nowrap overflow-hidden"
+                size="sm"
+                radius="sm"
+                variant="bordered"
+              >
                 {info.chains[0]}
+              </Chip>
+              <Chip
+                className="flag-emoji text-ellipsis whitespace-nowrap overflow-hidden"
+                size="sm"
+                radius="sm"
+                variant="bordered"
+              >
+                {info.rule}
+                {info.rulePayload ? `(${info.rulePayload})` : ''}
               </Chip>
               <Chip size="sm" radius="sm" variant="bordered">
                 ↑ {calcTraffic(info.upload)} ↓ {calcTraffic(info.download)}
