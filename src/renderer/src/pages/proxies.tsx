@@ -297,7 +297,6 @@ const Proxies: React.FC = () => {
                       onSelect={onChangeProxy}
                       proxy={allProxies[groupIndex][innerIndex * cols + i]}
                       group={groups[groupIndex]}
-                      proxyDisplayMode={proxyDisplayMode}
                       selected={
                         allProxies[groupIndex][innerIndex * cols + i]?.name ===
                         groups[groupIndex].now
