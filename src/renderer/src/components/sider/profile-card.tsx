@@ -27,19 +27,19 @@ const ProfileCard: React.FC = () => {
       .filter((provider) => {
         return 'subscriptionInfo' in provider
       })
-  }, [data]).reverse()
+  }, [data])
   const location = useLocation()
   const match = location.pathname.includes('/profiles')
   const [updating, setUpdating] = useState(false)
-  const [index, setIndex] = useState(0)
+  const [count, setCount] = useState(0)
   const [showRuntimeConfig, setShowRuntimeConfig] = useState(false)
   const { profileConfig, addProfileItem } = useProfileConfig()
   const { current, items } = profileConfig ?? {}
   const subscriptionInfo = providers.length ? {
-    upload: providers[index].subscriptionInfo?.Upload,
-    download: providers[index].subscriptionInfo?.Download,
-    total: providers[index].subscriptionInfo?.Total,
-    expire: providers[index].subscriptionInfo?.Expire,
+    upload: providers[count].subscriptionInfo?.Upload,
+    download: providers[count].subscriptionInfo?.Download,
+    total: providers[count].subscriptionInfo?.Total,
+    expire: providers[count].subscriptionInfo?.Expire,
   } : null
   const {
     attributes,
@@ -105,15 +105,16 @@ const ProfileCard: React.FC = () => {
                 <Button
                   isIconOnly
                   size="sm"
-                  title={providers[index].name}
+                  title={providers[count].name}
                   variant="light"
                   color="default"
                   onPress={() => {
-                    if (index < providers.length - 1) {
-                      setIndex(index + 1)
+                    if (count < providers.length - 1) {
+                      setCount(count + 1)
                     } else {
-                      setIndex(0)
+                      setCount(0)
                     }
+                    mutate()
                   }}
                 >
                   <IoMdSwap
@@ -139,7 +140,7 @@ const ProfileCard: React.FC = () => {
                 <Button
                   isIconOnly
                   size="sm"
-                  title={dayjs(subscriptionInfo ? providers[index].updatedAt : info.updated).fromNow()}
+                  title={dayjs(subscriptionInfo ? providers[count].updatedAt : info.updated).fromNow()}
                   disabled={updating}
                   variant="light"
                   color="default"
@@ -147,7 +148,7 @@ const ProfileCard: React.FC = () => {
                     setUpdating(true)
                     if (subscriptionInfo) {
                       try {
-                        await mihomoUpdateProxyProviders(providers[index].name)
+                        await mihomoUpdateProxyProviders(providers[count].name)
                       } finally {
                         mutate()
                       }
