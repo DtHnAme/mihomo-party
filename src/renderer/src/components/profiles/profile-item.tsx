@@ -9,6 +9,7 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Progress,
+  Spinner,
   Tooltip
 } from '@nextui-org/react'
 import { calcPercent, calcTraffic } from '@renderer/utils/calc'
@@ -181,10 +182,18 @@ const ProfileItem: React.FC<Props> = (props) => {
             setSelecting(false)
           })
         }}
-        className={`${isCurrent ? 'bg-primary' : ''} ${selecting ? 'blur-sm' : ''}`}
+        className={`${isCurrent ? 'bg-primary' : ''}`}
       >
         <div ref={setNodeRef} {...attributes} {...listeners} className="w-full h-full">
-          <CardBody className="pb-1">
+          {selecting && (
+            <Spinner 
+              color={`${isCurrent ? 'white' : 'primary'}`}
+              className="absolute h-full w-full flex justify-center"
+            >
+              <div className={`${isCurrent ? "text-white" : "text-primary"}`}>切换中...</div>
+            </Spinner>
+          )}
+          <CardBody className={`pb-1 ${selecting ? 'blur-sm' : ''}`}>
             <div className="flex justify-between h-[32px]">
               <h3
                 title={info?.name}
@@ -270,7 +279,7 @@ const ProfileItem: React.FC<Props> = (props) => {
               </div>
             )}
           </CardBody>
-          <CardFooter className="pt-0">
+          <CardFooter className={`pt-0 ${selecting ? 'blur-sm' : ''}`}>
             {info.type === 'remote' && !extra && (
               <div
                 className={`w-full mt-2 flex justify-between ${isCurrent ? 'text-primary-foreground' : 'text-foreground'}`}
