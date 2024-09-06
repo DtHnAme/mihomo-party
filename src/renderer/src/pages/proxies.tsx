@@ -1,27 +1,30 @@
-import { Avatar, Button, Card, CardBody, Chip } from '@nextui-org/react'
+import { Avatar, Button, Card, CardBody, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Popover, PopoverContent, PopoverTrigger } from '@nextui-org/react'
 import BasePage from '@renderer/components/base/base-page'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import {
   getImageDataURL,
+  getNetworkIPInfo,
   mihomoChangeProxy,
   mihomoCloseAllConnections,
   mihomoProxyDelay
 } from '@renderer/utils/ipc'
 import { CgDetailsLess, CgDetailsMore } from 'react-icons/cg'
 import { TbCircleLetterD } from 'react-icons/tb'
-import { FaLocationCrosshairs } from 'react-icons/fa6'
+import { FaEarthAsia, FaLocationCrosshairs, FaNetworkWired } from 'react-icons/fa6'
 import { RxLetterCaseCapitalize } from 'react-icons/rx'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { GroupedVirtuoso, GroupedVirtuosoHandle } from 'react-virtuoso'
 import ProxyItem from '@renderer/components/proxies/proxy-item'
 import { IoIosArrowBack } from 'react-icons/io'
-import { MdDoubleArrow, MdOutlineSpeed } from 'react-icons/md'
+import { MdDoubleArrow, MdOutlineSpeed, MdWeb } from 'react-icons/md'
 import { useGroups } from '@renderer/hooks/use-groups'
 import CollapseInput from '@renderer/components/base/collapse-input'
 import { includesIgnoreCase } from '@renderer/utils/includes'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
+import useSWR from 'swr'
 
 const Proxies: React.FC = () => {
+  const { data: info, mutate: mutateInfo} = useSWR('getNetworkIPInfo', getNetworkIPInfo)
   const { controledMihomoConfig } = useControledMihomoConfig()
   const { mode = 'rule' } = controledMihomoConfig || {}
   const { groups = [], mutate } = useGroups()
@@ -76,6 +79,7 @@ const Proxies: React.FC = () => {
       await mihomoCloseAllConnections()
     }
     mutate()
+    mutateInfo()
   }
 
   const onProxyDelay = async (proxy: string, url?: string): Promise<IMihomoDelay> => {
@@ -137,6 +141,39 @@ const Proxies: React.FC = () => {
     }
   }
 
+  const countryCodeEmoji = (countryCode: string | undefined): string => {
+    if (!countryCode) return ''
+
+    const codePoints = countryCode
+      .toUpperCase()
+      .split('')
+      .map(char => 127397 + char.charCodeAt(0));
+    return String.fromCodePoint(...codePoints)
+  }
+
+  const infoItems = [
+    {
+      key: "Country",
+      icon: <FaEarthAsia/>,
+      label: info?.country
+    },
+    {
+      key: "Network",
+      icon: <FaNetworkWired/>,
+      label: info?.organization
+    },
+    {
+      key: "ASN Code",
+      icon: <FaLocationCrosshairs/>,
+      label: `${info?.continent_code}${info?.asn}`,
+    },
+    {
+      key: "IP Address",
+      icon: <MdWeb/>,
+      label: info?.ip
+    }
+  ]
+
   useEffect(() => {
     if (proxyCols !== 'auto') {
       setCols(parseInt(proxyCols))
@@ -156,6 +193,35 @@ const Proxies: React.FC = () => {
       title="代理组"
       header={
         <>
+          <Dropdown>
+            <DropdownTrigger>
+              <Button size="sm" variant="light" className="app-nodrag flag-emoji" disableRipple>
+                <span>{countryCodeEmoji(info?.country_code)}</span>
+                <span>{info?.country}</span>
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu
+              onAction={(key) => navigator.clipboard.writeText(
+                  infoItems.find((item) => item.key === key)?.label as string
+                )
+              }
+              items={infoItems}
+            >
+              {(item) => (
+                <DropdownItem 
+                  key={item.key}
+                  description={item.label}
+                  startContent={
+                    <div className="text-lg text-default-500 pointer-events-none flex-shrink-0">
+                      {item.icon}
+                    </div>
+                  }
+                >
+                  {item.key}
+                </DropdownItem>
+              )}
+            </DropdownMenu>
+          </Dropdown>
           <Button
             size="sm"
             isIconOnly

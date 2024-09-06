@@ -1,6 +1,7 @@
 export { getAppConfig, patchAppConfig } from './app'
 export { getControledMihomoConfig, patchControledMihomoConfig } from './controledMihomo'
 export {
+  getNetworkIPInfo,
   getProfile,
   getCurrentProfileItem,
   getProfileItem,

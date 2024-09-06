@@ -462,3 +462,13 @@ interface ISubStoreSub {
   icon?: string
   tag?: string[]
 }
+
+interface INetworkIPInfo {
+  organization: string
+  asn: number
+  asn_organization: string
+  country: string
+  ip: string
+  continent_code: string
+  country_code: string
+}
