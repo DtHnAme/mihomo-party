@@ -8,7 +8,8 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-  Progress
+  Progress,
+  Spinner
 } from '@nextui-org/react'
 import { calcPercent, calcTraffic } from '@renderer/utils/calc'
 import { IoMdMore, IoMdRefresh } from 'react-icons/io'
@@ -177,9 +178,17 @@ const ProfileItem: React.FC<Props> = (props) => {
             setSelecting(false)
           })
         }}
-        className={`${isCurrent ? 'bg-primary' : ''} ${selecting ? 'blur-sm' : ''}`}
+        className={`${isCurrent ? 'bg-primary' : ''}`}
       >
-        <CardBody className="pb-1">
+        {selecting && (
+          <Spinner 
+            label="切换中..."
+            color={`${isCurrent ? 'current' : 'primary'}`}
+            labelColor={`${isCurrent ? 'foreground' : 'primary'}`}
+            className="absolute h-full w-full flex justify-center"
+          />
+        )}
+        <CardBody className={`pb-1 ${selecting ? 'blur-sm' : ''}`}>
           <div className="flex justify-between h-[32px]">
             <h3
               ref={setNodeRef}
@@ -260,7 +269,7 @@ const ProfileItem: React.FC<Props> = (props) => {
             </div>
           )}
         </CardBody>
-        <CardFooter className="pt-0">
+        <CardFooter className={`pt-0 ${selecting ? 'blur-sm' : ''}`}>
           {extra && (
             <Progress
               className="w-full"
