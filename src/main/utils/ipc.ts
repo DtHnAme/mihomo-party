@@ -23,6 +23,7 @@ import {
   patchAppConfig,
   getControledMihomoConfig,
   patchControledMihomoConfig,
+  getNetworkIPInfo,
   getProfileConfig,
   getCurrentProfileItem,
   getProfileItem,
@@ -120,6 +121,7 @@ export function registerIpcMainHandlers(): void {
   ipcMain.handle('patchControledMihomoConfig', (_e, config) =>
     ipcErrorWrapper(patchControledMihomoConfig)(config)
   )
+  ipcMain.handle('getNetworkIPInfo', ipcErrorWrapper(getNetworkIPInfo))
   ipcMain.handle('getProfileConfig', (_e, force) => ipcErrorWrapper(getProfileConfig)(force))
   ipcMain.handle('setProfileConfig', (_e, config) => ipcErrorWrapper(setProfileConfig)(config))
   ipcMain.handle('getCurrentProfileItem', ipcErrorWrapper(getCurrentProfileItem))

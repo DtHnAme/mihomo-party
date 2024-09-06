@@ -171,6 +171,18 @@ export async function getProfile(id: string | undefined): Promise<IMihomoConfig>
   return yaml.parse(profile)
 }
 
+export async function getNetworkIPInfo(): Promise<INetworkIPInfo> {
+  const { 'mixed-port': mixedPort = 7890 } = await getControledMihomoConfig()
+  const res = await axios.get("https://api.ip.sb/geoip", {
+    proxy: {
+      protocol: 'http',
+      host: '127.0.0.1',
+      port: mixedPort
+    }
+  })
+  return res.data as INetworkIPInfo
+}
+
 // attachment;filename=xxx.yaml; filename*=UTF-8''%xx%xx%xx
 function parseFilename(str: string): string {
   if (str.match(/filename\*=.*''/)) {

@@ -111,6 +111,10 @@ export async function patchControledMihomoConfig(patch: Partial<IMihomoConfig>):
   )
 }
 
+export async function getNetworkIPInfo(): Promise<INetworkIPInfo> {
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('getNetworkIPInfo'))
+}
+
 export async function getProfileConfig(force = false): Promise<IProfileConfig> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('getProfileConfig', force))
 }

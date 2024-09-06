@@ -1,7 +1,8 @@
-import { Avatar, Button, Card, CardBody, Chip } from '@nextui-org/react'
+import { Avatar, Button, Card, CardBody, Chip, Popover, PopoverContent, PopoverTrigger } from '@nextui-org/react'
 import BasePage from '@renderer/components/base/base-page'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import {
+  getNetworkIPInfo,
   mihomoChangeProxy,
   mihomoCloseAllConnections,
   mihomoGroupDelay,
@@ -17,8 +18,11 @@ import ProxyItem from '@renderer/components/proxies/proxy-item'
 import { IoIosArrowBack } from 'react-icons/io'
 import { MdOutlineSpeed } from 'react-icons/md'
 import { useGroups } from '@renderer/hooks/use-groups'
+import useSWR from 'swr'
+import SettingItem from '@renderer/components/base/base-setting-item'
 
 const Proxies: React.FC = () => {
+  const { data: info, mutate: mutateInfo} = useSWR('getNetworkIPInfo', getNetworkIPInfo)
   const { groups = [], mutate } = useGroups()
   const { appConfig, patchAppConfig } = useAppConfig()
   const {
@@ -67,6 +71,7 @@ const Proxies: React.FC = () => {
       await mihomoCloseAllConnections()
     }
     mutate()
+    mutateInfo()
   }
 
   const onProxyDelay = async (proxy: string, url?: string): Promise<IMihomoDelay> => {
@@ -90,6 +95,16 @@ const Proxies: React.FC = () => {
     }
   }
 
+  const countryCodeEmoji = (countryCode: string | undefined): string => {
+    if (!countryCode) return ''
+
+    const codePoints = countryCode
+      .toUpperCase()
+      .split('')
+      .map(char => 127397 + char.charCodeAt(0));
+    return String.fromCodePoint(...codePoints)
+  }
+
   useEffect(() => {
     if (proxyCols !== 'auto') {
       setCols(parseInt(proxyCols))
@@ -109,6 +124,33 @@ const Proxies: React.FC = () => {
       title="代理组"
       header={
         <>
+          <Popover placement='bottom' showArrow>
+            <PopoverTrigger>
+              <Button size="sm" variant="light" className="app-nodrag flag-emoji" disableRipple>
+                <span>{countryCodeEmoji(info?.country_code)}</span>
+                <span>{info?.country}</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent>
+              <div 
+                className="px-2 py-2 leading-[32px] select-text" 
+                onClick={() => mutateInfo()} 
+              >
+                <SettingItem title="CNT">
+                  <span className="select-text">{info?.country}</span>
+                </SettingItem>
+                <SettingItem title="NET">
+                  <span className="select-text">{info?.organization}</span>
+                </SettingItem>
+                <SettingItem title="ASN">
+                  <span className="select-text">{info?.continent_code}{info?.asn}</span>
+                </SettingItem>
+                <SettingItem title="IP">
+                  <span className="select-text">{info?.ip}</span>
+                </SettingItem>
+              </div>
+            </PopoverContent>
+          </Popover>
           <Button
             size="sm"
             isIconOnly
