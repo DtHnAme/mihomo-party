@@ -146,7 +146,7 @@ const Proxies: React.FC = () => {
                   <span className="select-text">{info?.continent_code}{info?.asn}</span>
                 </SettingItem>
                 <SettingItem title="IP">
-                  <span className="select-text">{info?.ip}</span>
+                  <span className="select-text blur-sm hover:blur-none transition-all">{info?.ip}</span>
                 </SettingItem>
               </div>
             </PopoverContent>
