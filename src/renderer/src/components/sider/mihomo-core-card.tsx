@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardFooter } from '@nextui-org/react'
+import { Button, Card, CardBody, CardFooter, Spinner } from '@nextui-org/react'
 import { calcTraffic } from '@renderer/utils/calc'
 import { mihomoVersion, restartCore } from '@renderer/utils/ipc'
 import { useEffect, useState } from 'react'
@@ -59,9 +59,17 @@ const MihomoCoreCard: React.FC = () => {
         ref={setNodeRef} {...attributes} {...listeners}
         className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? 'scale-[0.97] tap-highlight-transparent' : ''}`}
       >
+        {loading && (
+          <Spinner 
+            color={`${match ? "white" : 'current'}`}
+            className="absolute h-full w-full flex justify-center"
+          >
+            <div className={`${match ? "text-white" : "text-current"}`}>连接中...</div>
+          </Spinner>
+        )}
         <CardBody>
           <div
-            className="flex justify-between h-[32px]"
+            className={`flex justify-between h-[32px] ${loading ? 'blur-sm' : ''}`}
           >
             <h3
               className={`text-md font-bold leading-[32px] ${match ? 'text-white' : 'text-foreground'} `}
@@ -71,13 +79,10 @@ const MihomoCoreCard: React.FC = () => {
 
             <Button
               isIconOnly
-              isLoading={loading}
               size="sm"
               variant="light"
               color="default"
-              spinner={
-                <IoMdRefresh className={`${match ? 'text-white' : 'text-foreground'} animate-spin text-[24px]`}/>
-              }
+              isDisabled={loading}
               onPress={async () => {
                 try {
                   await restartCore()
@@ -94,9 +99,9 @@ const MihomoCoreCard: React.FC = () => {
         </CardBody>
         <CardFooter className="pt-1">
           <div
-            className={`flex justify-between w-full text-md font-bold ${match ? 'text-white' : 'text-foreground'}`}
+            className={`flex justify-between w-full text-md font-bold ${match ? 'text-white' : 'text-foreground'} ${loading ? 'blur-sm' : ''}`}
           >
-            <h4>{loading ? '连接中...' : '内核设置'}</h4>
+            <h4>内核设置</h4>
             <h4>{calcTraffic(mem)}</h4>
           </div>
         </CardFooter>
