@@ -10,7 +10,7 @@ import routes from '@renderer/routes'
 import {
   DndContext,
   closestCorners,
-  PointerSensor,
+  MouseSensor,
   useSensor,
   useSensors,
   DragEndEvent
@@ -55,7 +55,7 @@ const App: React.FC = () => {
     ]
   } = appConfig || {}
   const [order, setOrder] = useState(siderOrder)
-  const sensors = useSensors(useSensor(PointerSensor))
+  const sensors = useSensors(useSensor(MouseSensor))
   const { setTheme, systemTheme } = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
@@ -111,6 +111,7 @@ const App: React.FC = () => {
         newOrder.splice(overIndex, 0, active.id as string)
         setOrder(newOrder)
         await patchAppConfig({ siderOrder: newOrder })
+        return
       }
     }
     navigate(navigateMap[active.id as string])
