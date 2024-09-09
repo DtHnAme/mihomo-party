@@ -182,11 +182,11 @@ const ProfileItem: React.FC<Props> = (props) => {
       >
         {selecting && (
           <Spinner 
-            label="切换中..."
-            color={`${isCurrent ? 'current' : 'primary'}`}
-            labelColor={`${isCurrent ? 'foreground' : 'primary'}`}
+            color={`${isCurrent ? 'white' : 'primary'}`}
             className="absolute h-full w-full flex justify-center"
-          />
+          >
+            <div className={`${isCurrent ? "text-white" : "text-primary"}`}>切换中...</div>
+          </Spinner>
         )}
         <CardBody className={`pb-1 ${selecting ? 'blur-sm' : ''}`}>
           <div className="flex justify-between h-[32px]">
