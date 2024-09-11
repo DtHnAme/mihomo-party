@@ -13,6 +13,7 @@ export {
   getProfileStr,
   setProfileStr,
   changeCurrentProfile,
+  reloadCurrentProfile,
   updateProfileItem
 } from './profile'
 export {

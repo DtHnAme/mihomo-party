@@ -1,7 +1,7 @@
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@nextui-org/react'
 import React, { useEffect, useState } from 'react'
 import { BaseEditor } from '../base/base-editor'
-import { getOverride, restartCore, setOverride } from '@renderer/utils/ipc'
+import { getOverride, setOverride, reloadCurrentProfile } from '@renderer/utils/ipc'
 interface Props {
   id: string
   language: 'javascript' | 'yaml'
@@ -49,7 +49,7 @@ const EditFileModal: React.FC<Props> = (props) => {
             onPress={async () => {
               try {
                 await setOverride(id, language === 'javascript' ? 'js' : 'yaml', currData)
-                await restartCore()
+                await reloadCurrentProfile()
                 onClose()
               } catch (e) {
                 alert(e)

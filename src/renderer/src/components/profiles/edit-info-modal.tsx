@@ -13,7 +13,7 @@ import {
 import React, { useState } from 'react'
 import SettingItem from '../base/base-setting-item'
 import { useOverrideConfig } from '@renderer/hooks/use-override-config'
-import { restartCore } from '@renderer/utils/ipc'
+import { reloadCurrentProfile } from '@renderer/utils/ipc'
 interface Props {
   item: IProfileItem
   updateProfileItem: (item: IProfileItem) => Promise<void>
@@ -28,7 +28,7 @@ const EditInfoModal: React.FC<Props> = (props) => {
   const onSave = async (): Promise<void> => {
     try {
       await updateProfileItem(values)
-      await restartCore()
+      await reloadCurrentProfile()
       onClose()
     } catch (e) {
       alert(e)

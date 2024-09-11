@@ -135,6 +135,10 @@ export async function changeCurrentProfile(id: string): Promise<void> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('changeCurrentProfile', id))
 }
 
+export async function reloadCurrentProfile(): Promise<void> {
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('reloadCurrentProfile'))
+}
+
 export async function addProfileItem(item: Partial<IProfileItem>): Promise<void> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('addProfileItem', item))
 }

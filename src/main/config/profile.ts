@@ -1,8 +1,10 @@
 import { getControledMihomoConfig } from './controledMihomo'
-import { profileConfigPath, profilePath } from '../utils/dirs'
+import { mihomoWorkConfigPath, profileConfigPath, profilePath } from '../utils/dirs'
 import { addProfileUpdater } from '../core/profileUpdater'
 import { readFile, rm, writeFile } from 'fs/promises'
 import { restartCore } from '../core/manager'
+import { putMihomoConfig } from '../core/mihomoApi'
+import { generateProfile } from '../core/factory'
 import { getAppConfig } from './app'
 import { existsSync } from 'fs'
 import axios from 'axios'
@@ -36,13 +38,19 @@ export async function changeCurrentProfile(id: string): Promise<void> {
   config.current = id
   await setProfileConfig(config)
   try {
-    await restartCore()
+    await generateProfile()
+    await putMihomoConfig(mihomoWorkConfigPath())
   } catch (e) {
     config.current = current
     throw e
   } finally {
     await setProfileConfig(config)
   }
+}
+
+export async function reloadCurrentProfile(): Promise<void> {
+  await generateProfile()
+  await putMihomoConfig(mihomoWorkConfigPath())
 }
 
 export async function updateProfileItem(item: IProfileItem): Promise<void> {
