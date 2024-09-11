@@ -15,7 +15,7 @@ import {
 import React, { useState } from 'react'
 import SettingItem from '../base/base-setting-item'
 import { useOverrideConfig } from '@renderer/hooks/use-override-config'
-import { restartCore } from '@renderer/utils/ipc'
+import { reloadCurrentProfile } from '@renderer/utils/ipc'
 import { MdDeleteForever } from 'react-icons/md'
 import { FaPlus } from 'react-icons/fa6'
 
@@ -39,7 +39,7 @@ const EditInfoModal: React.FC<Props> = (props) => {
             overrideItems.find((t) => t.id === i) && !overrideItems.find((t) => t.id === i)?.global
         )
       })
-      await restartCore()
+      await reloadCurrentProfile()
       onClose()
     } catch (e) {
       alert(e)

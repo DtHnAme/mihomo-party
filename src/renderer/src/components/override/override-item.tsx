@@ -16,7 +16,7 @@ import EditInfoModal from './edit-info-modal'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import ExecLogModal from './exec-log-modal'
-import { openFile, restartCore } from '@renderer/utils/ipc'
+import { openFile, reloadCurrentProfile } from '@renderer/utils/ipc'
 
 interface Props {
   info: IOverrideItem
@@ -188,7 +188,7 @@ const OverrideItem: React.FC<Props> = (props) => {
                       setUpdating(true)
                       try {
                         await addOverrideItem(info)
-                        await restartCore()
+                        await reloadCurrentProfile()
                       } catch (e) {
                         alert(e)
                       } finally {

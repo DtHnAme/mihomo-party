@@ -10,7 +10,7 @@ import {
 } from '@nextui-org/react'
 import React, { useState } from 'react'
 import SettingItem from '../base/base-setting-item'
-import { restartCore } from '@renderer/utils/ipc'
+import { reloadCurrentProfile } from '@renderer/utils/ipc'
 interface Props {
   item: IOverrideItem
   updateOverrideItem: (item: IOverrideItem) => Promise<void>
@@ -22,7 +22,7 @@ const EditInfoModal: React.FC<Props> = (props) => {
 
   const onSave = async (): Promise<void> => {
     await updateOverrideItem(values)
-    await restartCore()
+    await reloadCurrentProfile()
     onClose()
   }
 

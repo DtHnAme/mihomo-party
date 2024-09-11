@@ -1,8 +1,10 @@
 import { getControledMihomoConfig } from './controledMihomo'
-import { mihomoProfileWorkDir, mihomoWorkDir, profileConfigPath, profilePath } from '../utils/dirs'
+import { mihomoProfileWorkDir, mihomoWorkConfigPath, mihomoWorkDir, profileConfigPath, profilePath } from '../utils/dirs'
 import { addProfileUpdater } from '../core/profileUpdater'
 import { readFile, rm, writeFile } from 'fs/promises'
-import { restartCore } from '../core/manager'
+import { checkProfile, restartCore } from '../core/manager'
+import { putMihomoConfig } from '../core/mihomoApi'
+import { generateProfile } from '../core/factory'
 import { getAppConfig } from './app'
 import { existsSync } from 'fs'
 import axios, { AxiosResponse } from 'axios'
@@ -34,18 +36,27 @@ export async function getProfileItem(id: string | undefined): Promise<IProfileIt
 }
 
 export async function changeCurrentProfile(id: string): Promise<void> {
+  const { diffWorkDir = false } = await getAppConfig()
   const config = await getProfileConfig()
   const current = config.current
   config.current = id
   await setProfileConfig(config)
   try {
-    await restartCore()
+    await generateProfile()
+    await putMihomoConfig(
+      diffWorkDir ? mihomoWorkConfigPath(id) : mihomoWorkConfigPath('work')
+    )
   } catch (e) {
     config.current = current
     throw e
   } finally {
     await setProfileConfig(config)
   }
+}
+
+export async function reloadCurrentProfile(): Promise<void> {
+  const { current } = await getProfileConfig()
+  await changeCurrentProfile(current!!);
 }
 
 export async function updateProfileItem(item: IProfileItem): Promise<void> {
