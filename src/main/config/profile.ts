@@ -60,6 +60,7 @@ export async function updateProfileItem(item: IProfileItem): Promise<void> {
     throw new Error('Profile not found')
   }
   config.items[index] = item
+  await addProfileUpdater(item)
   await setProfileConfig(config)
 }
 
@@ -73,7 +74,7 @@ export async function addProfileItem(item: Partial<IProfileItem>): Promise<void>
   }
   await setProfileConfig(config)
 
-  if (!config.current) {
+  if (!config.current || config.current === newItem.id) {
     await changeCurrentProfile(newItem.id)
   }
   await addProfileUpdater(newItem)
@@ -170,8 +171,10 @@ export async function getProfileStr(id: string | undefined): Promise<string> {
 
 export async function setProfileStr(id: string, content: string): Promise<void> {
   const { current } = await getProfileConfig()
-  await writeFile(profilePath(id), content, 'utf-8')
-  if (current === id) await restartCore()
+  if (content !== '') {
+    await writeFile(profilePath(id), content, 'utf-8')
+    if (current === id) await restartCore()
+  }
 }
 
 export async function getProfile(id: string | undefined): Promise<IMihomoConfig> {

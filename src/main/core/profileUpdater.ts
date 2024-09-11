@@ -24,7 +24,7 @@ export async function initProfileUpdater(): Promise<void> {
       }
     }
   }
-  if (currentItem?.type === 'remote' && currentItem.interval) {
+  if (currentItem.interval) {
     intervalPool[currentItem.id] = setTimeout(
       async () => {
         try {
@@ -44,10 +44,10 @@ export async function initProfileUpdater(): Promise<void> {
 }
 
 export async function addProfileUpdater(item: IProfileItem): Promise<void> {
-  if (item.type === 'remote' && item.interval) {
-    if (intervalPool[item.id]) {
-      clearTimeout(intervalPool[item.id])
-    }
+  if (intervalPool[item.id]) {
+    clearTimeout(intervalPool[item.id])
+  }
+  if (item.interval) {
     intervalPool[item.id] = setTimeout(
       async () => {
         try {
