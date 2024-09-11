@@ -79,13 +79,14 @@ export const mihomoProxies = async (): Promise<IMihomoProxies> => {
 }
 
 export const mihomoGroups = async (): Promise<IMihomoMixedGroup[]> => {
+  const { proxyDisplayHidden = 'hidden' } = await getAppConfig()
   const proxies = await mihomoProxies()
   const runtime = await getRuntimeConfig()
   const groups: IMihomoMixedGroup[] = []
   runtime?.['proxy-groups']?.forEach((group: { name: string; url?: string }) => {
     group = Object.assign(group, group['<<'])
     const { name, url } = group
-    if (proxies.proxies[name] && 'all' in proxies.proxies[name] && !proxies.proxies[name].hidden) {
+    if (proxies.proxies[name] && 'all' in proxies.proxies[name] && (!proxies.proxies[name].hidden || proxyDisplayHidden !== 'hidden')) {
       const newGroup = proxies.proxies[name]
       newGroup.testUrl = url
       const newAll = newGroup.all.map((name) => proxies.proxies[name])

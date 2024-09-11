@@ -17,6 +17,7 @@ import { GroupedVirtuoso, GroupedVirtuosoHandle } from 'react-virtuoso'
 import ProxyItem from '@renderer/components/proxies/proxy-item'
 import { IoIosArrowBack } from 'react-icons/io'
 import { MdOutlineSpeed } from 'react-icons/md'
+import { BiHide, BiShow } from 'react-icons/bi'
 import { useGroups } from '@renderer/hooks/use-groups'
 import useSWR from 'swr'
 import SettingItem from '@renderer/components/base/base-setting-item'
@@ -27,6 +28,7 @@ const Proxies: React.FC = () => {
   const { appConfig, patchAppConfig } = useAppConfig()
   const {
     proxyDisplayMode = 'simple',
+    proxyDisplayHidden = 'hidden',
     proxyDisplayOrder = 'default',
     autoCloseConnection = true,
     proxyCols = 'auto'
@@ -190,6 +192,24 @@ const Proxies: React.FC = () => {
               <CgDetailsMore className="text-lg" title="详细信息" />
             ) : (
               <CgDetailsLess className="text-lg" title="简洁信息" />
+            )}
+          </Button>
+          <Button
+            size="sm"
+            isIconOnly
+            variant="light"
+            className="app-nodrag"
+            onPress={() => {
+              patchAppConfig({
+                proxyDisplayHidden: proxyDisplayHidden === 'show' ? 'hidden' : 'show'
+              })
+              mutate()
+            }}
+          >
+            {proxyDisplayHidden === 'show' ? (
+              <BiShow className="text-lg" title="显示代理" />
+            ) : (
+              <BiHide className="text-lg" title="隐藏代理" />
             )}
           </Button>
         </>

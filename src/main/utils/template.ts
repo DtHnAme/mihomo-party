@@ -7,6 +7,7 @@ export const defaultConfig: IAppConfig = {
   maxLogDays: 7,
   proxyCols: 'auto',
   proxyDisplayMode: 'simple',
+  proxyDisplayHidden: 'hidden',
   proxyDisplayOrder: 'default',
   autoCheckUpdate: true,
   autoCloseConnection: true,
