@@ -9,6 +9,7 @@ import {
   DropdownTrigger
 } from '@nextui-org/react'
 import { IoMdMore, IoMdRefresh } from 'react-icons/io'
+import { CgLoadbarDoc } from 'react-icons/cg'
 import dayjs from 'dayjs'
 import React, { Key, useEffect, useState } from 'react'
 import EditFileModal from './edit-file-modal'
@@ -175,6 +176,15 @@ const OverrideItem: React.FC<Props> = (props) => {
               {info?.name}
             </h3>
             <div className="flex">
+              <Button
+                isIconOnly
+                size="sm"
+                color="default"
+                variant="light"
+                onPress={() => setOpenLog(true)}
+              >
+                <CgLoadbarDoc className="text-[24px]"/>
+              </Button>
               {info.type === 'remote' && (
                 <Button
                   isIconOnly
