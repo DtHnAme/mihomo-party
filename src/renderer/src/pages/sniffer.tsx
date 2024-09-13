@@ -3,7 +3,7 @@ import BasePage from '@renderer/components/base/base-page'
 import SettingCard from '@renderer/components/base/base-setting-card'
 import SettingItem from '@renderer/components/base/base-setting-item'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
-import { restartCore } from '@renderer/utils/ipc'
+import { reloadCurrentProfile } from '@renderer/utils/ipc'
 import React, { useState } from 'react'
 import { MdDeleteForever } from 'react-icons/md'
 
@@ -34,7 +34,7 @@ const Sniffer: React.FC = () => {
 
   const onSave = async (patch: Partial<IMihomoConfig>): Promise<void> => {
     await patchControledMihomoConfig(patch)
-    await restartCore()
+    await reloadCurrentProfile()
   }
 
   const handleSniffPortChange = (protocol: keyof typeof sniff, value: string): void => {

@@ -5,7 +5,7 @@ import SettingCard from '@renderer/components/base/base-setting-card'
 import SettingItem from '@renderer/components/base/base-setting-item'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { restartCore } from '@renderer/utils/ipc'
+import { reloadCurrentProfile } from '@renderer/utils/ipc'
 import React, { Key, ReactNode, useState } from 'react'
 
 const DNS: React.FC = () => {
@@ -113,7 +113,7 @@ const DNS: React.FC = () => {
       useNameserverPolicy: values.useNameserverPolicy
     })
     await patchControledMihomoConfig(patch)
-    await restartCore()
+    await reloadCurrentProfile()
   }
 
   return (
