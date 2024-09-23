@@ -218,7 +218,7 @@ jobs:
           - mihomo-party-electron
           - mihomo-party-bin
           - mihomo-party
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: false
     needs: linux
     runs-on: ubuntu-latest
     steps:
@@ -255,7 +255,7 @@ jobs:
           allow_empty_commits: false
 
   aur-git-updater:
-    if: startsWith(github.ref, 'refs/heads/')
+    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
