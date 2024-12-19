@@ -22,6 +22,7 @@ import CollapseInput from '@renderer/components/base/collapse-input'
 import { includesIgnoreCase } from '@renderer/utils/includes'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
 import useSWR from 'swr'
+import { BiCopy } from 'react-icons/bi'
 
 const Proxies: React.FC = () => {
   const { data: info, mutate: mutateInfo} = useSWR('getNetworkIPInfo', getNetworkIPInfo)
@@ -215,6 +216,9 @@ const Proxies: React.FC = () => {
                     <div className="text-lg text-default-500 pointer-events-none flex-shrink-0">
                       {item.icon}
                     </div>
+                  }
+                  endContent={
+                    <BiCopy className={`text-lg text-default-600 flex-shrink-0`}/>
                   }
                 >
                   {item.key}
