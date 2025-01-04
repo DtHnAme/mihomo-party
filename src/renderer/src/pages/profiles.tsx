@@ -196,6 +196,9 @@ const Profiles: React.FC = () => {
           isIconOnly
           onPress={async () => {
             setUpdating(true)
+            setTimeout(() => {
+              setUpdating(false)
+            }, 30000)
             for (const item of items) {
               if (item.id === current) continue
               if (item.type !== 'remote') continue

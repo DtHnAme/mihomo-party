@@ -185,6 +185,9 @@ const ProfileCard: React.FC<Props> = (props) => {
                       color="default"
                       onPress={async () => {
                         setUpdating(true)
+                        setTimeout(() => {
+                          setUpdating(false)
+                        }, 10000)
                         if (subscriptionInfo) {
                           try {
                             await mihomoUpdateProxyProviders(providers[count].name)

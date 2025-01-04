@@ -212,6 +212,9 @@ const ProfileItem: React.FC<Props> = (props) => {
                       disabled={updating}
                       onPress={async () => {
                         setUpdating(true)
+                        setTimeout(() => {
+                          setUpdating(false)
+                        }, 10000)
                         await addProfileItem(info)
                         setUpdating(false)
                       }}

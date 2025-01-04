@@ -186,6 +186,9 @@ const OverrideItem: React.FC<Props> = (props) => {
                     disabled={updating}
                     onPress={async () => {
                       setUpdating(true)
+                      setTimeout(() => {
+                        setUpdating(false)
+                      }, 10000)
                       try {
                         await addOverrideItem(info)
                         await reloadCurrentProfile()
